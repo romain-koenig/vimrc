@@ -221,7 +221,7 @@ autocmd BufReadPost *
 " Afficher les espaces invisibles (trailing, tabs)
 " ============================================================
 set list
-set listchars=tab:→\ ,trail:·,nbsp:␣
+set listchars=tab:→\ ,trail:·,nbsp:␣,extends:…
 
 " ============================================================
 " TIPS
