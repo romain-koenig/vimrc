@@ -1,283 +1,218 @@
+" ============================================================
+" .vimrc — Romain
+" ============================================================
 
-set diffexpr=MyDiff()
-function MyDiff()
-        let opt = '-a --binary '
-        if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
-        if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
-        let arg1 = v:fname_in
-        if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
-        let arg2 = v:fname_new
-        if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
-        let arg3 = v:fname_out
-        if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
-        let eq = ''
-        if $VIMRUNTIME =~ ' '
-                if &sh =~ '\<cmd'
-                        let cmd = '""' . $VIMRUNTIME . '\diff"'
-                        let eq = '"'
-                else
-                        let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
-                endif
-        else
-                let cmd = $VIMRUNTIME . '\diff'
-        endif
-        silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3 . eq
-endfunction
 set nocompatible
-" source $VIMRUNTIME/vimrc_example.vim
-source $VIMRUNTIME/mswin.vim
-behave mswin
+filetype plugin indent on
 
+" ---- vim-plug (auto-install) --------------------------------
 let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
 if empty(glob(data_dir . '/autoload/plug.vim'))
-  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  silent execute '!curl -fLo ' . data_dir . '/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
-" COLORSCHEME
+call plug#begin()
+" Ajoute tes plugins ici
+" Plug 'arcticicestudio/nord-vim'
+call plug#end()
+
+
+" ============================================================
+" APPARENCE
+" ============================================================
 
 colorscheme desert
-"colorscheme nord
+" colorscheme nord
+
+syntax on
+
+set number          " numéros de ligne
+set ruler           " position curseur
+set showcmd         " commandes incomplètes en bas
+set laststatus=2    " barre de statut toujours visible
+set cursorline      " surligne la ligne courante
+set scrolloff=3     " garde 3 lignes visibles autour du curseur
+
+set guifont=Consolas:h11
+au GUIEnter * winsize 120 50
 
 
+" ============================================================
+" COMPORTEMENT GÉNÉRAL
+" ============================================================
 
-" Gestion de mises en forme rapide
-
-" F8 = Cadre
-" F7 = Ligne longue (80)
-" F6 = ligne précise
-
-map <F8> :call Cadre()<CR>
-function! Cadre()
-        :s/^.*$/| & |
-        normal yyP
-        normal yyP
-        :s/./-/g
-        :s/^./+/g
-        :s/.$/+/g
-        normal jj
-        :s/./-/g
-        :s/^./+/g
-        :s/.$/+/g
-endfunction
-
-
-map <F7> :call Line80()<CR>
-function! Line80()
-        normal o
-        normal 80i-
-        normal o
-        normal j
-endfunction
-
-map <F6> :call Line()<CR>
-function! Line()
-        normal yyp
-        s/./-/g
-endfunction
-
-
-" Quand un fichier est changé en dehors de Vim, il est relu automatiquement
-" set autoread
-
-
-
-" allow backspacing over everything in insert mode
+set hidden          " buffers cachés plutôt que fermés
 set backspace=indent,eol,start
-
-:set dir=$HOME\vim
-
-if has("autocmd") && exists("+omnifunc")
-        autocmd Filetype *
-                                \    if &omnifunc == "" |
-                                \        setlocal omnifunc=syntaxcomplete#Complete |
-                                \    endif
-endif
-
-"set ic
-set ignorecase smartcase
-
-set ruler        " show the cursor position all the time
-set showcmd        " display incomplete commands
-set incsearch        " do incremental searching
-
-
-
-
-augroup filetypedetect
-        au BufRead,BufNewFile *.todo setfiletype todo
-augroup END
-
-augroup filetypedetect
-        "au BufRead,BufNewFile *.pl setfiletype plsql
-        au BufRead,BufNewFile *.pl setfiletype sql
-augroup END
-
-augroup filetypedetect
-        " log files such as catalina.out or log4j files.
-        au! BufRead,BufNewFile catalina.out,*.out,*.out.*,*.log,*.log.* setf log
-augroup END
-
-
-" http://nvie.com/posts/how-i-boosted-my-vim/
-
-" One particularly useful setting is hidden.
-" Its name isn’t too descriptive, though.
-" It hides buffers instead of closing them.
-" This means that you can have unwritten changes to a file and open a new file using :e,
-" without being forced to write or undo your changes first.
-" Also, undo buffers and marks are preserved while the buffer is open.
-" This is an absolute must-have.
-
-set hidden
-
-set number        " always show line numbers
-
-
-if getline(1) =~? '^#\?TODO\>'
-        setfiletype todo
-endif
-
-" Ouverture vimrc
-:nnoremap <F9> :e C:\Program Files\Vim\_vimrc<CR>
-
-" Ouverture TODO.TODO
-":nnoremap <F9> :e C:\Users\Koenig\Desktop\TODO.TODO<CR>
-
-" Suppression des espaces superflus en fin de ligne
-:noremap <F4> :%s/\s\+$//<CR>:nohlsearch<CR>
-
-" Modification de dates : format AAAAMMJJ vers JJ/MM/AAAA
-" :noremap <F2> :%s/^\([0-9][0-9][0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)$/\3\/\2\/\1<CR>:nohlsearch<CR>
-
-map <F2> :call OrdreDate()<CR>
-function! OrdreDate()
-        :%s/^\([0-9][0-9][0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)$/\3\/\2\/\1
-        :%s/^0$//g
-        :nohlsearch
-endfunction
-
-"set nowrap
-set lbr
-
-"make open directory use current directory
+set history=100
+set autoread        " relit les fichiers modifiés en dehors de Vim
+set wildmenu        " complétion améliorée de la ligne de commande
 set browsedir=buffer
 
-" Activation de la syntaxe
-if has("syntax")
-        syntax on
+" Encodages (ordre de priorité)
+set fileencodings=utf-8,latin1,ucs-bom
+
+" Retour à la ligne "souple" (pas de coupure dure)
+set lbr
+" set nowrap
+
+
+" ============================================================
+" RECHERCHE
+" ============================================================
+
+set incsearch
+set ignorecase
+set smartcase
+set hlsearch
+
+" Effacer le surlignage de recherche avec Échap
+nnoremap <Esc> :nohlsearch<CR>
+
+
+" ============================================================
+" INDENTATION & FORMATAGE
+" ============================================================
+
+set expandtab       " tabulations → espaces
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
+
+
+" ============================================================
+" FICHIERS TEMPORAIRES
+" ============================================================
+
+set backup
+set writebackup
+set swapfile
+
+let s:tmpdir = $HOME . '/vim-temporary-files'
+execute 'set backupdir=' . s:tmpdir
+execute 'set directory=' . s:tmpdir
+
+
+" ============================================================
+" DÉTECTION DE TYPES DE FICHIERS
+" ============================================================
+
+augroup filetypes
+  autocmd!
+  au BufRead,BufNewFile *.todo               setfiletype todo
+  au BufRead,BufNewFile *.pl                 setfiletype sql
+  au BufRead,BufNewFile catalina.out,*.out,*.out.*,*.log,*.log.* setfiletype log
+augroup END
+
+" Détection todo sur la première ligne
+if getline(1) =~? '^#\?TODO\>'
+  setfiletype todo
 endif
 
-filetype plugin on
+
+" ============================================================
+" AUTOCOMPLÉTION (fallback syntaxique)
+" ============================================================
+
+if has("autocmd") && exists("+omnifunc")
+  autocmd Filetype *
+    \ if &omnifunc == "" |
+    \   setlocal omnifunc=syntaxcomplete#Complete |
+    \ endif
+endif
 
 
+" ============================================================
+" RACCOURCIS CLAVIER
+" ============================================================
 
+" Ouvrir ce vimrc rapidement
+nnoremap <F9> :e $MYVIMRC<CR>
 
-" Clears search highlighting by just hitting a return.
-" The <BS> clears the command line.
-" (From Zdenek Sekera [zs@sgi.com]  on the vim list.)
-" I added the final <cr> to restore the standard behaviour of
-" <cr> to go to the next line
-:nnoremap <CR> :nohlsearch<CR>/<BS><CR>
+" Suppression des espaces en fin de ligne
+noremap <F4> :%s/\s\+$//<CR>:nohlsearch<CR>
 
+" Navigation par onglets (style Firefox)
+nnoremap <C-Tab>   gt
+nnoremap <C-S-Tab> gT
+nnoremap <C-t>     :tabnew<CR>
 
-" Gestion des onglets identique à Firefox
-" Navigation avec Ctrl-Tab
-" Next
-:nnoremap <C-Tab> gt
-" Previous
-:nnoremap <C-S-Tab> gT
-" New
-:nnoremap <C-t> :tabnew<CR>
-" Fermeture (annulé car entre en conflit avec la bascule multi-fenetres)
-" :nnoremap <C-w> :q<CR>
-
-" Mode sans perturbations
+" Mode sans distractions (gVim)
 map <F11> :set guioptions-=m<CR>:set guioptions-=T<CR>
-" Retour au mode normal
 map <F12> :set guioptions+=m<CR>:set guioptions+=T<CR>
 
 
-" Mise en évidence des espaces en fin de ligne
-"set list
-"set lcs:tab:>-,trail:X
+" ============================================================
+" FONCTIONS DE MISE EN FORME
+" ============================================================
 
-"File Encoding (dans l'ordre)
-set fileencodings=utf-8,latin1,ucs-bom
-"set fileencodings=utf-8
+" F8 — Encadrement ASCII (+----+)
+map <F8> :call Cadre()<CR>
+function! Cadre()
+  :s/^.*$/| & |/
+  normal yyP
+  normal yyP
+  :s/./-/g
+  :s/^./+/g
+  :s/.$/+/g
+  normal jj
+  :s/./-/g
+  :s/^./+/g
+  :s/.$/+/g
+endfunction
 
+" F7 — Séparateur de 80 tirets
+map <F7> :call Line80()<CR>
+function! Line80()
+  normal o
+  normal 80i-
+  normal o
+  normal j
+endfunction
 
+" F6 — Souligner la ligne courante avec des tirets
+map <F6> :call Line()<CR>
+function! Line()
+  normal yyp
+  s/./-/g
+endfunction
 
-" Police par défaut
-set guifont=consolas
-
-"au GUIEnter * simalt ~n %1
-
-"Démarrage plein écran
-"au GUIEnter * simalt ~n %
-
-"Démarrage fenêtré
-"au GUIEnter * winsize 80 50
-au GUIEnter * winsize 120 50
-
-"Gestion de l'ouverture de fichier par rapport à l'extension
-let ext = expand("%:e")
-
-if ext == 'sql'
-        " au GUIEnter * winsize 68 50
-        set shiftwidth=4
-        set textwidth=67
-        " Alignement permettant d'avoir les bonnes ruptures pour copier coller les
-        " requetes dans IKOS
-        :noremap <F5> :call IndentSQL()<CR>
-        :noremap <F10> :call SQLSelectToUpdate()<CR>
-
-endif
-
-function! IndentSQL()
-"        :s/(\s*/(/g
-"        :s/\s*)/)/g
-        :s/\s\+/ /g
-        :normal ^^gU$<CR>
-" PLUGIN ChangeSqlCase http://www.vim.org/scripts/script.php?script_id=869
-"        :normal ^^v$
-"        :call ChangeSqlCase()
-        :normal ^^v$gq<CR>
-
+" F2 — Conversion date AAAAMMJJ → JJ/MM/AAAA
+map <F2> :call OrdreDate()<CR>
+function! OrdreDate()
+  :%s/^\([0-9]\{4}\)\([0-9]\{2}\)\([0-9]\{2}\)$/\3\/\2\/\1/e
+  :%s/^0$//ge
+  :nohlsearch
 endfunction
 
 
+" ============================================================
+" SQL
+" ============================================================
 
-" Tabulations en espaces
-set expandtab
+augroup sql_settings
+  autocmd!
+  autocmd BufRead,BufNewFile *.sql
+    \ setlocal shiftwidth=4 textwidth=67 |
+    \ noremap <buffer> <F5>  :call IndentSQL()<CR> |
+    \ noremap <buffer> <F10> :call SQLSelectToUpdate()<CR>
+augroup END
 
-" cwbundbs
-
-"set backup
-set history=100
-
-" Gestion du backup
-set backup
-"set nobackup
-set writebackup
-"set nowritebackup
-set swapfile
-"set noswapfile
-
-set backupdir=/home/romain/vim-temporary-files/
-set directory=/home/romain/vim-temporary-files/
-set dir=/home/romain/vim-temporary-files/
+function! IndentSQL()
+  :s/\s\+/ /g
+  :normal ^^gU$
+  :normal ^^v$gq
+endfunction
 
 
-
-
-
-" ----- TIPS ----- "
+" ============================================================
+" TIPS
+" ============================================================
 "
-"  Delete lines NOT containing "FOO"
-"  :v/FOO/d
+"  Supprimer les lignes NE contenant PAS "FOO" :
+"    :v/FOO/d
 "
-
-
-
-
+"  Trier les lignes sélectionnées :
+"    :'<,'>sort
+"
