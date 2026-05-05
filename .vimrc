@@ -205,6 +205,19 @@ function! IndentSQL()
   :normal ^^v$gq
 endfunction
 
+" ============================================================
+" Mémoriser la position du curseur à la réouverture
+" ============================================================
+
+autocmd BufReadPost *
+  \ if line("'\"") >= 1 && line("'\"") <= line("$") |
+  \   execute "normal! g`\"" |
+  \ endif
+" ============================================================
+" Afficher les espaces invisibles (trailing, tabs)
+" ============================================================
+set list
+set listchars=tab:→\ ,trail:·,nbsp:␣
 
 " ============================================================
 " TIPS
