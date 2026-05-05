@@ -38,7 +38,8 @@ set laststatus=2    " barre de statut toujours visible
 set cursorline      " surligne la ligne courante
 set scrolloff=3     " garde 3 lignes visibles autour du curseur
 
-set guifont=Consolas:h11
+
+set guifont=Fira\ Code\ weight=450\ 12
 au GUIEnter * winsize 120 50
 
 
