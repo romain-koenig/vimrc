@@ -5,6 +5,9 @@
 set nocompatible
 filetype plugin indent on
 
+source $VIMRUNTIME/mswin.vim
+behave mswin
+
 " ---- vim-plug (auto-install) --------------------------------
 let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
 if empty(glob(data_dir . '/autoload/plug.vim'))
